@@ -1,0 +1,4 @@
+Version <?=$version?> - Date <?=$date?>
+
+	* Initial directory structure created by Peg.
+
