@@ -54,6 +54,13 @@ class Option
 	public $default_value;
 	
 	/**
+	 * Indicates if an option of type FLAG was passed on the command line.
+	 * 
+	 * @var boolean
+	 */
+	public $active;
+	
+	/**
 	 * Flag that indicates if the option is required or not.
 	 * 
 	 * @var bool
@@ -119,6 +126,10 @@ class Option
 		if($this->type == OptionType::STRING && is_string($this->default_value))
 			return true;
 		
+		// Check if flag
+		if($this->type == OptionType::FLAG && $this->active)
+			return true;
+		
 		return false;
 	}
 	
@@ -149,6 +160,13 @@ class Option
 	{
 		if(strstr($value, "-") === false && strstr($value, "--") === false)
 		{
+			if(
+				$this->type == OptionType::STRING &&
+				$this->required &&
+				strlen($value) < 1
+			)
+				return false;
+			
 			$this->value = $value;
 			return true;
 		}

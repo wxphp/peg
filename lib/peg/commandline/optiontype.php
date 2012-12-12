@@ -15,13 +15,18 @@ namespace Peg\CommandLine;
 class OptionType
 {	
 	/**
-	 * Accepts any type of string
+	 * Accepts any type of string.
 	 */
 	const STRING=1;
 	
 	/**
-	 * Only accept numbers
+	 * Only accept numbers.
 	 */
 	const INTEGER=2;
+	
+	/**
+	 * Doesn't needs a value, just to be present.
+	 */
+	const FLAG=3;
 }
 ?>

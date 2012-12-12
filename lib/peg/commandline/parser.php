@@ -5,7 +5,6 @@
  * @license 
  * This file is part of PEG check the license file for information.
  * 
- * 
 */
 
 namespace Peg\CommandLine;
@@ -15,8 +14,18 @@ namespace Peg\CommandLine;
  */
 class Parser
 {
+	/**
+	 * Stores the number of arguments passed on command line.
+	 * 
+	 * @var integer
+	 */
 	private $argument_count;
 	
+	/**
+	 * Stores the values passed on the command line.
+	 * 
+	 * @var string[] 
+	 */
 	private $argument_values;
 	/**
 	 * List of command line options registered on the parser.
@@ -116,8 +125,8 @@ class Parser
 	}
 	
 	/**
-	 * Begins the process of reading command line options and calling actions
-	 * as needed.
+	 * Begins the process of reading command line options and calling command
+	 * actions as needed.
 	 * 
 	 * @param integer $argc
 	 * @param array $argv
@@ -127,15 +136,25 @@ class Parser
 		$this->argument_count = $argc;
 		$this->argument_values = $argv;
 		
-		if($this->argument_count <= 1)
+		if(
+			$this->argument_count <= 1 ||
+			in_array("-h", $this->argument_values) ||
+			in_array("--help", $this->argument_values)	
+		)
 		{
 			$this->PrintHelp();
 		}
 		
+		if(in_array("--version", $this->argument_values))
+		{
+			$this->PrintVersion();
+		}
+		
 		if($this->IsCommand($this->argument_values[1]))
 		{
-			$command = $this->commands[$this->argument_values[$i]];
-			$this->ParseOptions($command->options);
+			$command = $this->commands[$this->argument_values[1]];
+			$this->ParseOptions($command->options, $command);
+			$command->Execute();
 
 			return;
 		}
@@ -150,28 +169,180 @@ class Parser
 	 */
 	public function PrintHelp()
 	{
+		// Store the len of the longest command name
+		$max_command_len = 0;
+		
+		//Store the len of longest command name
+		$max_option_len = 0;
+		
 		print $this->application_name . " v" . $this->application_version . "\n";
 		print $this->application_description . "\n\n";
+		
+		print "Usage:\n";
+		print "   " . $this->application_name . " [options]\n";
+		
+		if(count($this->commands) > 0)
+		{
+			foreach($this->commands as $command)
+			{
+				if(strlen($command->name) > $max_command_len)
+					$max_command_len = strlen($command->name);
+				
+				if(count($command->options) > 0)
+				{
+					foreach($command->options as $option)
+					{
+						if(strlen($option->long_name) > $max_option_len)
+							$max_option_len = strlen($option->long_name);
+					}
+				}
+			}
+			
+			print "   peg <command> [options]\n";
+		}
+		
+		if(count($this->commands) > 0)
+		{
+			print "\nCommands:\n";
+			
+			foreach($this->commands as $command)
+			{
+				if(count($command->options) > 0)
+				{
+					$line = "  " . str_pad($command->name, $max_command_len+2) . $command->description;
+					$line = wordwrap($line, 80);
+					$line_array = explode("\n", $line);
+					
+					print $line_array[0] . "\n";
+					unset($line_array[0]);
+					
+					if(count($line_array) > 0)
+					{
+						foreach($line_array as $line)
+						{
+							print str_pad($line, strlen($line)+($max_command_len+4), " ", STR_PAD_LEFT) . "\n";
+						}
+					}
+					
+					if(count($command->options) > 0)
+					{
+						print "\n";
+						print "    " . "Options:" . "\n";
+						foreach($command->options as $option)
+						{
+							$line = 
+								"      " . 
+								str_pad(
+									"-" . $option->short_name . "  --" . $option->long_name,
+									$max_option_len+8
+								) . 
+								$option->description
+							;
+							
+							$line = wordwrap($line, 80);
+							$line_array = explode("\n", $line);
+							
+							print $line_array[0] . "\n";
+							unset($line_array[0]);
+							
+							if(count($line_array) > 0)
+							{
+								foreach($line_array as $line)
+								{
+									print str_pad($line, strlen($line)+($max_option_len+14), " ", STR_PAD_LEFT) . "\n";
+								}
+							}
+						}
+					}
+				}
+				
+				print "\n";
+			}
+		}
+			
+		
+		exit(0);
 	}
 	
+	/**
+	 * Generates and prints the help based on the registered commands and options.
+	 */
+	public function PrintVersion()
+	{
+		print "v" . $this->application_version . "\n";
+		
+		exit(0);
+	}
+	
+	/**
+	 * Checks if a given name is registered as a command.
+	 * 
+	 * @param string $name
+	 * 
+	 * @return boolean
+	 */
 	private function IsCommand($name)
 	{
 		return isset($this->commands[$name]);
 	}
 	
 	/**
-	 * Parses the command line options depending on a set of given options.
-	 * 
+	 * Checks if a given option exists on a given options array
+	 * @param type $name
 	 * @param \Peg\CommandLine\Option[] $options
 	 */
-	private function ParseOptions(&$options)
+	private function OptionExists($name, $options)
 	{
+		foreach($options as $option)
+		{
+			if($option->long_name == $name || $option->short_name == $name)
+				return true;
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Parses the command line options depending on a set of given options.
+	 * The given options are updated with the values assigned on the
+	 * command line.
+	 * 
+	 * @param \Peg\CommandLine\Option[] $options
+	 * @param \Peg\CommandLine\Command $command
+	 */
+	private function ParseOptions(&$options, \Peg\CommandLine\Command $command=null)
+	{	
 		foreach($options as $index=>$option)
 		{
-			for($argi=1; $argi<$this->argument_count; $argi++)
+			$argi = 1;
+			
+			// If command passed start parsing after it.
+			if($command)
+				$argi = 2;
+			
+			for($argi; $argi<$this->argument_count; $argi++)
 			{
+				$argument_original = $this->argument_values[$argi];
 				$argument = $this->argument_values[$argi];
-				$argument_next = $this->argument_values[$argi+1];
+				$argument_next = "";
+				
+				if($command != null)
+				{
+					if(
+						strstr($argument, "-") === false &&
+						strstr($argument, "--") === false
+					)
+					{
+						$command->value = trim($command->value . " " . $argument);
+						continue;
+					}
+					
+				}
+				
+				if($argi+1 < $this->argument_count)
+				{
+					$argument_next = $this->argument_values[$argi+1];
+				}
 				
 				if(
 					strstr($argument, "-") !== false ||
@@ -180,27 +351,38 @@ class Parser
 				{
 					$argument = str_replace("-", "", $argument);
 					
-					if(
-						$argument == $option->long_name ||
-						$argument == $option->short_name
-					)
+					if($this->OptionExists($argument, $options))
 					{
-						if($option->SetValue($argument_next))
-							$argi++; //Forward to next argument
-						
-						if($option->IsValid())
+						if(
+							$argument == $option->long_name ||
+							$argument == $option->short_name
+						)
 						{
-							$options[$index] = $option;
-						}
-						else
-						{
-							throw new \Exception("Invalid value supplied for '$argument'");
+							switch($option->type)
+							{
+								case OptionType::FLAG:
+									$option->active = true;
+									break;
+
+								default:
+									if($option->SetValue($argument_next))
+										$argi++; //Forward to next argument
+							}
+
+							if($option->IsValid())
+							{
+								$options[$index] = $option;
+							}
+							else
+							{
+								Error::Show("Invalid value supplied for '$argument_original'");
+							}
 						}
 					}
-				}
-				elseif(!$this->IsCommand($argument))
-				{
-					throw new \Exception("Invalid parameter '$argument'");
+					elseif(!$this->IsCommand($argument))
+					{
+						Error::Show("Invalid parameter '$argument_original'");
+					}
 				}
 			}
 		}

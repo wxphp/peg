@@ -22,6 +22,12 @@ class Command
 	public $name;
 	
 	/**
+	 * Description of the command displayed on help.
+	 * @var string
+	 */
+	public $description;
+	
+	/**
 	 * Array of Options processed by the command.
 	 * @var \Peg\CommandLine\Option[] 
 	 */
@@ -44,11 +50,10 @@ class Command
 	 * Array of Actions called if this command gets executed.
 	 * @var \Peg\CommandLine\Action[]
 	 */
-	public $actions;
+	static $actions;
 	
 	/**
 	 * Initialize the command.
-	 * 
 	 * @param string $name Name of the Sub-command
 	 * @param \Peg\CommandLine\Option[] $options List of options
 	 * @param \Peg\CommandLine\Action[] $actions List of actions
@@ -57,7 +62,9 @@ class Command
 	{
 		$this->name = $name;
 		$this->options = $options;
-		$this->actions = $actions;
+		$this->value = "";
+		
+		self::$actions = $actions;
 	}
 	
 	/**
@@ -70,23 +77,23 @@ class Command
 	}
 	
 	/**
-	 * Register actions that get call when command is executed.
-	 * @param \Peg\CommandLine\Action $action
-	 */
-	public function RegisterAction(Action $action)
-	{
-		$this->actions[] = $action;
-	}
-	
-	/**
 	 * Execute each action associated to the command.
 	 */
 	public function Execute()
 	{
-		foreach($this->actions as $action)
+		foreach(self::$actions as $action)
 		{
 			$action->OnCall($this);
 		}
+	}
+	
+	/**
+	 * Register actions that get call when command is executed.
+	 * @param \Peg\CommandLine\Action $action
+	 */
+	public static function RegisterAction(Action $action)
+	{
+		self::$actions[] = $action;
 	}
 }
 
