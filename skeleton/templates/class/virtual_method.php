@@ -72,7 +72,7 @@
 		#endif
 		
 <? if($method_definition["pure_virtual"]){ ?>
-		wxMessageBox("Failed to call virtual method '<?=$class_name?>::<?=$method_name?>'!", "Error", wxOK|wxICON_ERROR);
+		zend_error(E_NOTICE, "Failed to call virtual method '<?=$class_name?>::<?=$method_name?>'!");
 <? } ?>
 	}
 <? if(!$method_definition["pure_virtual"]){ ?>

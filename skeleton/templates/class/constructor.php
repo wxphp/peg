@@ -1,4 +1,4 @@
-<?=proto_begin($method_name, $class_name)?>
+<?=proto_begin($method_name, $class_name)?> 
 PHP_METHOD(php_<?=$class_name?>, __construct)
 {
 	#ifdef USE_<?=strtoupper($extension)?>_DEBUG
@@ -16,11 +16,11 @@ PHP_METHOD(php_<?=$class_name?>, __construct)
 	int arguments_received = ZEND_NUM_ARGS();
 	
 	
-	<?=function_parameters($method_definitions, $method_name, $class_name)?>
+	<?=function_parameters($method_definitions, $method_name, $class_name)?> 
 	
-	<?=function_called_overload($method_definitions, $method_name, $class_name)?>
+	<?=function_called_overload($method_definitions, $method_name, $class_name)?> 
 	
-	<?=function_return($method_definitions, $method_name, $class_name, true)?>
+	<?=function_return($method_definitions, $method_name, $class_name, true)?> 
 	
 	if(already_called)
 	{

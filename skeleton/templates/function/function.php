@@ -1,7 +1,7 @@
-<?=proto_begin($function_name)?>
+<?=proto_begin($function_name)?> 
 PHP_FUNCTION(php_<?=$function_name?>)
 {
-	#ifdef USE_WXPHP_DEBUG
+	#ifdef USE_<?=strtoupper($extension)?>_DEBUG
 	php_printf("Invoking function <?=$function_name?>\n");
 	php_printf("===========================================\n");
 	#endif
@@ -26,4 +26,4 @@ PHP_FUNCTION(php_<?=$function_name?>)
 		zend_error(E_ERROR, "Wrong type or count of parameters passed to <?=$function_name?>()\n");
 	}
 }
-<?=proto_end()?>
+<?=proto_end()?> 

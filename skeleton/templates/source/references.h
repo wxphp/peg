@@ -37,7 +37,7 @@ public:
 	/**
 	 * To turn on the flag that indicates that the php class using
 	 * this object was initialized by the php user space and not internally
-	 * by wxWidgets
+	 * by the extension.
 	 */
 	void Initialize();
 	

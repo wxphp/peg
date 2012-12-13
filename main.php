@@ -10,12 +10,22 @@
  * 
 */
 
+// Change this as needed
+define("PEG_SKELETON_PATH", "./skeleton");
+define("PEG_LIBRARY_PATH", "./");
+
+if(!file_exists(PEG_LIBRARY_PATH . "lib"))
+	throw new Exception("Peg lib path not found.");
+
+if(!file_exists(PEG_LIBRARY_PATH . "lib"))
+	throw new Exception("Peg skeleton files path not found.");
+
 // Register class auto-loader
 function peg_autoloader($class_name)
-{
+{	
 	$file = str_replace("\\", "/", $class_name) . ".php";
 
-	include("lib/".strtolower($file));
+	include(PEG_LIBRARY_PATH . "lib/".strtolower($file));
 }
 
 spl_autoload_register("peg_autoloader");

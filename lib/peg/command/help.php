@@ -12,7 +12,7 @@ namespace Peg\Command;
 use Peg\Application;
 
 /**
- * Display help only for a given command.
+ * Display overall help or for a given command.
  */
 class Help extends \Peg\CommandLine\Command
 {

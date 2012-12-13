@@ -16,7 +16,6 @@ class Error
 {
 	/**
 	 * Displays a message and exits the application with error status code.
-	 * 
 	 * @param string $message The message to display before exiting the application.
 	 */
 	public static function Show($message)

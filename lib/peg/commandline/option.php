@@ -17,7 +17,6 @@ class Option
 	/**
 	 * The human readable name of the option. Example: --use-something stored
 	 * on this variable as use-something.
-	 * 
 	 * @var string
 	 */
 	public $long_name;
@@ -25,7 +24,6 @@ class Option
 	/**
 	 * A one letter case-sensitive alias for the option. Example: -u stored on 
 	 * this variable as u.
-	 * 
 	 * @var string
 	 */
 	public $short_name;
@@ -33,14 +31,12 @@ class Option
 	/**
 	 * Data type of the option represented by one of the constants from 
 	 * \Peg\CommandLine\OptionType
-	 * 
-	 * @var integer 
+	 * @var integer
 	 */
 	public $type;
 	
 	/**
 	 * Current value of the option.
-	 * 
 	 * @var integer|string
 	 */
 	public $value;
@@ -48,37 +44,32 @@ class Option
 	/**
 	 * A default value used in case the user didn't provided one and the option
 	 * isn't marked as required.
-	 * 
-	 * @var type 
+	 * @var integer|string
 	 */
 	public $default_value;
 	
 	/**
 	 * Indicates if an option of type FLAG was passed on the command line.
-	 * 
 	 * @var boolean
 	 */
 	public $active;
 	
 	/**
 	 * Flag that indicates if the option is required or not.
-	 * 
-	 * @var bool
+	 * @var boolean
 	 */
 	public $required;
 	
 	/**
 	 * Information displayed when the application is executed without
 	 * options or with: -h, --help
-	 * 
-	 * @var type 
+	 * @var string 
 	 */
 	public $description;
 	
 	/**
 	 * Initilize the option with an optional list of properties defined
 	 * on an array.
-	 * 
 	 * @param array $properties
 	 */
 	public function __construct($properties=null)
@@ -101,7 +92,6 @@ class Option
 	
 	/**
 	 * Checks if the option value is valid.
-	 * 
 	 * @return boolean
 	 */
 	public function IsValid()
@@ -136,7 +126,6 @@ class Option
 	/**
 	 * Automatically returns the current or default value or null if neither
 	 * is set.
-	 * 
 	 * @return int|string
 	 */
 	public function GetValue()
@@ -153,12 +142,12 @@ class Option
 	/**
 	 * Useful to add a value while checking if the value isn't in fact another
 	 * parameter like --other -o
-	 * 
+	 * @param integer|string $value
 	 * @return boolean True if value was set otherwise false.
 	 */
 	public function SetValue($value)
 	{
-		if(strstr($value, "-") === false && strstr($value, "--") === false)
+		if(ltrim($value, "-") == $value)
 		{
 			if(
 				$this->type == OptionType::STRING &&

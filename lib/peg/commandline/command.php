@@ -5,7 +5,6 @@
  * @license 
  * This file is part of PEG check the license file for information.
  * 
- * 
 */
 
 namespace Peg\CommandLine;

@@ -16,27 +16,24 @@ class Parser
 {
 	/**
 	 * Stores the number of arguments passed on command line.
-	 * 
 	 * @var integer
 	 */
 	private $argument_count;
 	
 	/**
 	 * Stores the values passed on the command line.
-	 * 
 	 * @var string[] 
 	 */
 	private $argument_values;
+	
 	/**
 	 * List of command line options registered on the parser.
-	 * 
 	 * @var \Peg\CommandLine\Option[]
 	 */
 	private $options;
 	
 	/**
 	 * List of sub-commands registered on the parser.
-	 * 
 	 * @var \Peg\CommandLine\Command[] 
 	 */
 	private $commands;
@@ -44,7 +41,6 @@ class Parser
 	/**
 	 * Name of the main application using the command line parser, displayed
 	 * when printing the help message.
-	 * 
 	 * @var string 
 	 */
 	public $application_name;
@@ -52,7 +48,6 @@ class Parser
 	/**
 	 * Version number of the main application using the command line parser,
 	 * displayed when printing the help message.
-	 * 
 	 * @var string 
 	 */
 	public $application_version;
@@ -60,7 +55,6 @@ class Parser
 	/**
 	 * Description of the main application using the command line parser,
 	 * displayed when printing the help message.
-	 * 
 	 * @var string 
 	 */
 	public $application_description;
@@ -80,7 +74,6 @@ class Parser
 	
 	/**
 	 * Get array of options.
-
 	 * @return \Peg\CommandLine\Option[]
 	 */
 	public function GetOptions()
@@ -103,7 +96,6 @@ class Parser
 	
 	/**
 	 * Get array of commands
-	 * 
 	 * @return \Peg\CommandLine\Command[]
 	 */
 	public function GetCommands()
@@ -153,7 +145,6 @@ class Parser
 	/**
 	 * Begins the process of reading command line options and calling command
 	 * actions as needed.
-	 * 
 	 * @param integer $argc
 	 * @param array $argv
 	 */
@@ -299,9 +290,7 @@ class Parser
 	
 	/**
 	 * Checks if a given name is registered as a command.
-	 * 
 	 * @param string $name
-	 * 
 	 * @return boolean
 	 */
 	private function IsCommand($name)
@@ -329,7 +318,6 @@ class Parser
 	 * Parses the command line options depending on a set of given options.
 	 * The given options are updated with the values assigned on the
 	 * command line.
-	 * 
 	 * @param \Peg\CommandLine\Option[] $options
 	 * @param \Peg\CommandLine\Command $command
 	 */
@@ -346,10 +334,7 @@ class Parser
 				{
 					$argument = $this->argument_values[$argi];
 
-					if(
-						strstr($argument, "-") === false &&
-						strstr($argument, "--") === false
-					)
+					if(ltrim($argument, "-") == $argument)
 					{
 						$command->value = trim($command->value . " " . $argument);
 						continue;
@@ -364,6 +349,9 @@ class Parser
 			}
 		}
 		
+		// Store values passed to the command to prevent repetition
+		$command_values = array();
+		
 		//Parse every option
 		foreach($options as $index=>$option)
 		{
@@ -375,6 +363,7 @@ class Parser
 				)
 					Error::Show ("Missing required option '--{$option->long_name}'");
 			}
+			
 			$argi = 1;
 			
 			// If command passed start parsing after it.
@@ -384,33 +373,17 @@ class Parser
 			for($argi; $argi<$this->argument_count; $argi++)
 			{
 				$argument_original = $this->argument_values[$argi];
-				$argument = $this->argument_values[$argi];
+				$argument = $argument_original;
 				$argument_next = "";
-				
-				if($command)
-				{
-					if(
-						strstr($argument, "-") === false &&
-						strstr($argument, "--") === false
-					)
-					{
-						$command->value = trim($command->value . " " . $argument);
-						continue;
-					}
-					
-				}
 				
 				if($argi+1 < $this->argument_count)
 				{
 					$argument_next = $this->argument_values[$argi+1];
 				}
 				
-				if(
-					strstr($argument, "-") !== false ||
-					strstr($argument, "--") !== false
-				)
+				if(ltrim($argument, "-") != $argument)
 				{
-					$argument = str_replace("-", "", $argument);
+					$argument = ltrim($argument, "-");
 					
 					if($this->OptionExists($argument, $options))
 					{
@@ -443,6 +416,46 @@ class Parser
 					elseif(!$this->IsCommand($argument))
 					{
 						Error::Show("Invalid parameter '$argument_original'");
+					}
+				}
+				else
+				{
+					if($command)
+					{
+						$previous_argument = "";
+						
+						if(isset($this->argument_values[$argi-1]))
+							$previous_argument = $this->argument_values[$argi-1];
+						
+						$previous_command_is_flag = false;
+						
+						if(ltrim($previous_argument, "-") != $previous_argument)
+						{
+							if($previous_command = $command->GetOption(ltrim($previous_argument, "-")))
+							{
+								if($previous_command->type == OptionType::FLAG)
+								{
+									$previous_command_is_flag = true;
+								}
+							}
+						}
+						
+						if(
+							(
+								ltrim($argument, "-") == $argument &&
+								ltrim($previous_argument, "-") == $previous_argument
+							) ||
+							$previous_command_is_flag
+						)
+						{
+							if(!in_array($argument, $command_values))
+							{
+								$command_values[] = $argument;
+								$command->value = trim($command->value . " " . $argument);
+								continue;
+							}
+						}
+
 					}
 				}
 			}

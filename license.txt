@@ -1,4 +1,4 @@
-
+MIT License
 
 Copyright (c) 2013 wxPHP Developers (http://github.com/wxphp)
 

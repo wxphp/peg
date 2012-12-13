@@ -41,10 +41,10 @@ class Help extends \Peg\CommandLine\Action
 	 */
 	public function PrintHelp(\Peg\CommandLine\Command $command)
 	{
-		// Store the len of the longest command name
+		// Store the lenght of longest command name
 		$max_command_len = 0;
 		
-		//Store the len of longest command name
+		// Store the lenght of longest option name
 		$max_option_len = 0;
 		
 		$parser = Application::GetParser();
@@ -71,6 +71,8 @@ class Help extends \Peg\CommandLine\Action
 		{
 			print "  peg {$command->name}\n\n";
 		}
+		
+		print "Description:\n";
 			
 		$line = "  " . str_pad($command->name, $max_command_len+2) . $command->description;
 		$line = wordwrap($line, 80);
@@ -90,11 +92,11 @@ class Help extends \Peg\CommandLine\Action
 		if(count($command->options) > 0)
 		{
 			print "\n";
-			print "    " . "Options:" . "\n";
+			print "Options:" . "\n";
 			foreach($command->options as $option)
 			{
 				$line = 
-					"      " . 
+					"  " . 
 					str_pad(
 						"-" . $option->short_name . "  --" . $option->long_name,
 						$max_option_len+8
@@ -112,7 +114,7 @@ class Help extends \Peg\CommandLine\Action
 				{
 					foreach($line_array as $line)
 					{
-						print str_pad($line, strlen($line)+($max_option_len+14), " ", STR_PAD_LEFT) . "\n";
+						print str_pad($line, strlen($line)+($max_option_len+10), " ", STR_PAD_LEFT) . "\n";
 					}
 				}
 			}
