@@ -89,6 +89,19 @@ class Parser
 	}
 	
 	/**
+	 * Get an option by its long name.
+	 * @param string $name
+	 * @return \Peg\CommandLine\Option|boolean
+	 */
+	public function GetOption($name)
+	{
+		if(isset($this->options[$name]))
+			return $this->options[$name];
+		
+		return false;
+	}
+	
+	/**
 	 * Get array of commands
 	 * 
 	 * @return \Peg\CommandLine\Command[]
@@ -96,6 +109,19 @@ class Parser
 	public function GetCommands()
 	{
 		return $this->commands;
+	}
+	
+	/**
+	 * Get a command object by its name.
+	 * @param string $name
+	 * @return \Peg\CommandLine\Command|boolean
+	 */
+	public function GetCommand($name)
+	{
+		if(isset($this->commands[$name]))
+			return $this->commands[$name];
+		
+		return false;
 	}
 	
 	/**
@@ -207,50 +233,47 @@ class Parser
 			
 			foreach($this->commands as $command)
 			{
+				$line = "  " . str_pad($command->name, $max_command_len+2) . $command->description;
+				$line = wordwrap($line, 80);
+				$line_array = explode("\n", $line);
+
+				print $line_array[0] . "\n";
+				unset($line_array[0]);
+
+				if(count($line_array) > 0)
+				{
+					foreach($line_array as $line)
+					{
+						print str_pad($line, strlen($line)+($max_command_len+4), " ", STR_PAD_LEFT) . "\n";
+					}
+				}
+					
 				if(count($command->options) > 0)
 				{
-					$line = "  " . str_pad($command->name, $max_command_len+2) . $command->description;
-					$line = wordwrap($line, 80);
-					$line_array = explode("\n", $line);
-					
-					print $line_array[0] . "\n";
-					unset($line_array[0]);
-					
-					if(count($line_array) > 0)
+					print "\n";
+					print "    " . "Options:" . "\n";
+					foreach($command->options as $option)
 					{
-						foreach($line_array as $line)
+						$line = 
+							"      " . 
+							str_pad(
+								"-" . $option->short_name . "  --" . $option->long_name,
+								$max_option_len+8
+							) . 
+							$option->description
+						;
+
+						$line = wordwrap($line, 80);
+						$line_array = explode("\n", $line);
+
+						print $line_array[0] . "\n";
+						unset($line_array[0]);
+
+						if(count($line_array) > 0)
 						{
-							print str_pad($line, strlen($line)+($max_command_len+4), " ", STR_PAD_LEFT) . "\n";
-						}
-					}
-					
-					if(count($command->options) > 0)
-					{
-						print "\n";
-						print "    " . "Options:" . "\n";
-						foreach($command->options as $option)
-						{
-							$line = 
-								"      " . 
-								str_pad(
-									"-" . $option->short_name . "  --" . $option->long_name,
-									$max_option_len+8
-								) . 
-								$option->description
-							;
-							
-							$line = wordwrap($line, 80);
-							$line_array = explode("\n", $line);
-							
-							print $line_array[0] . "\n";
-							unset($line_array[0]);
-							
-							if(count($line_array) > 0)
+							foreach($line_array as $line)
 							{
-								foreach($line_array as $line)
-								{
-									print str_pad($line, strlen($line)+($max_option_len+14), " ", STR_PAD_LEFT) . "\n";
-								}
+								print str_pad($line, strlen($line)+($max_option_len+14), " ", STR_PAD_LEFT) . "\n";
 							}
 						}
 					}
@@ -312,8 +335,46 @@ class Parser
 	 */
 	private function ParseOptions(&$options, \Peg\CommandLine\Command $command=null)
 	{	
+		// In case command doesn't has any options just copy any values passed to it
+		if($command)
+		{
+			if(count($command->options) <= 0)
+			{
+				$argi = 2;
+				
+				for($argi; $argi<$this->argument_count; $argi++)
+				{
+					$argument = $this->argument_values[$argi];
+
+					if(
+						strstr($argument, "-") === false &&
+						strstr($argument, "--") === false
+					)
+					{
+						$command->value = trim($command->value . " " . $argument);
+						continue;
+					}
+					else
+					{
+						Error::Show("Invalid parameter '$argument'");
+					}
+				}
+				
+				return;
+			}
+		}
+		
+		//Parse every option
 		foreach($options as $index=>$option)
 		{
+			if($option->required)
+			{
+				if(
+					!in_array("--".$option->long_name, $this->argument_values) &&
+					!in_array("-".$option->short_name, $this->argument_values)
+				)
+					Error::Show ("Missing required option '--{$option->long_name}'");
+			}
 			$argi = 1;
 			
 			// If command passed start parsing after it.
@@ -326,7 +387,7 @@ class Parser
 				$argument = $this->argument_values[$argi];
 				$argument_next = "";
 				
-				if($command != null)
+				if($command)
 				{
 					if(
 						strstr($argument, "-") === false &&

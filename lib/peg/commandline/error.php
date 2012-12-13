@@ -21,7 +21,7 @@ class Error
 	 */
 	public static function Show($message)
 	{
-		print $message . "\n";
+		print "Error: " . $message . "\n";
 		exit(1);
 	}
 }

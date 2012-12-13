@@ -50,7 +50,7 @@ class Command
 	 * Array of Actions called if this command gets executed.
 	 * @var \Peg\CommandLine\Action[]
 	 */
-	static $actions;
+	public $actions;
 	
 	/**
 	 * Initialize the command.
@@ -64,7 +64,7 @@ class Command
 		$this->options = $options;
 		$this->value = "";
 		
-		self::$actions = $actions;
+		$this->actions = $actions;
 	}
 	
 	/**
@@ -77,11 +77,29 @@ class Command
 	}
 	
 	/**
+	 * Gets an option by its long or short name.
+	 * @param type $name
+	 * @return null|\Peg\CommandLine\Option
+	 */
+	public function GetOption($name)
+	{
+		foreach($this->options as $option)
+		{
+			if($option->long_name == $name || $option->short_name == $name)
+			{
+				return $option;
+			}
+		}
+		
+		return null;
+	}
+	
+	/**
 	 * Execute each action associated to the command.
 	 */
 	public function Execute()
 	{
-		foreach(self::$actions as $action)
+		foreach($this->actions as $action)
 		{
 			$action->OnCall($this);
 		}
@@ -91,9 +109,9 @@ class Command
 	 * Register actions that get call when command is executed.
 	 * @param \Peg\CommandLine\Action $action
 	 */
-	public static function RegisterAction(Action $action)
+	public function RegisterAction(Action $action)
 	{
-		self::$actions[] = $action;
+		$this->actions[] = $action;
 	}
 }
 
