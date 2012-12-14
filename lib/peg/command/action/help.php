@@ -26,7 +26,7 @@ class Help extends \Peg\CommandLine\Action
 			}
 			else
 			{
-				\Peg\CommandLine\Error::Show("Invalid command supplied.");
+				\Peg\CommandLine\Error::Show(t("Invalid command supplied."));
 			}
 		}
 		else
@@ -50,9 +50,9 @@ class Help extends \Peg\CommandLine\Action
 		$parser = Application::GetParser();
 		
 		print $parser->application_name . " v" . $parser->application_version . "\n";
-		print $parser->application_description . "\n\n";
+		print t($parser->application_description) . "\n\n";
 		
-		print "Usage:\n";
+		print t("Usage:") . "\n";
 		
 		if(strlen($command->name) > $max_command_len)
 			$max_command_len = strlen($command->name);
@@ -65,16 +65,16 @@ class Help extends \Peg\CommandLine\Action
 					$max_option_len = strlen($option->long_name);
 			}
 			
-			print "  peg {$command->name} [options]\n\n";
+			print "  peg {$command->name} " . t("[options]") . "\n\n";
 		}
 		else
 		{
 			print "  peg {$command->name}\n\n";
 		}
 		
-		print "Description:\n";
+		print t("Description:") . "\n";
 			
-		$line = "  " . str_pad($command->name, $max_command_len+2) . $command->description;
+		$line = "  " . str_pad($command->name, $max_command_len+2) . t($command->description);
 		$line = wordwrap($line, 80);
 		$line_array = explode("\n", $line);
 
@@ -92,7 +92,7 @@ class Help extends \Peg\CommandLine\Action
 		if(count($command->options) > 0)
 		{
 			print "\n";
-			print "Options:" . "\n";
+			print t("Options:") . "\n";
 			foreach($command->options as $option)
 			{
 				$line = 
@@ -101,7 +101,7 @@ class Help extends \Peg\CommandLine\Action
 						"-" . $option->short_name . "  --" . $option->long_name,
 						$max_option_len+8
 					) . 
-					$option->description
+					t($option->description)
 				;
 
 				$line = wordwrap($line, 80);

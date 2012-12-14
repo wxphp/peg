@@ -67,9 +67,9 @@ class Parser
 		$this->options = array();
 		$this->commands = array();
 		
-		$this->application_name = "Untitled";
+		$this->application_name = t("Untitled");
 		$this->application_version = "0.1";
-		$this->application_description = "Untitled application description.";
+		$this->application_description = t("Untitled application description.");
 	}
 	
 	/**
@@ -126,7 +126,7 @@ class Parser
 		if(!isset($this->commands[$command->name]))
 			$this->commands[$command->name] = $command;
 		else
-			throw new \Exception("Command '{$command->name}' is already registered.");
+			throw new \Exception(t("Command") . " '{$command->name}' " . t("is already registered."));
 	}
 	
 	/**
@@ -139,7 +139,7 @@ class Parser
 		if(!isset($this->options[$option->long_name]))
 			$this->options[$option->long_name] = $option;
 		else
-			throw new \Exception("Option '{$option->long_name}' is already registered.");
+			throw new \Exception(t("Option") . " '{$option->long_name}' " . t("is already registered."));
 	}
 	
 	/**
@@ -193,10 +193,10 @@ class Parser
 		$max_option_len = 0;
 		
 		print $this->application_name . " v" . $this->application_version . "\n";
-		print $this->application_description . "\n\n";
+		print t($this->application_description) . "\n\n";
 		
-		print "Usage:\n";
-		print "   " . $this->application_name . " [options]\n";
+		print t("Usage:") . "\n";
+		print "   " . $this->application_name . " " . t("[options]") . "\n";
 		
 		if(count($this->commands) > 0)
 		{
@@ -215,16 +215,17 @@ class Parser
 				}
 			}
 			
-			print "   peg <command> [options]\n";
+			print "   peg <command> " . t("[options]") . "\n";
 		}
 		
 		if(count($this->commands) > 0)
 		{
-			print "\nCommands:\n";
+			print "\n";
+			print t("Commands:") . "\n";
 			
 			foreach($this->commands as $command)
 			{
-				$line = "  " . str_pad($command->name, $max_command_len+2) . $command->description;
+				$line = "  " . str_pad($command->name, $max_command_len+2) . t($command->description);
 				$line = wordwrap($line, 80);
 				$line_array = explode("\n", $line);
 
@@ -251,7 +252,7 @@ class Parser
 								"-" . $option->short_name . "  --" . $option->long_name,
 								$max_option_len+8
 							) . 
-							$option->description
+							t($option->description)
 						;
 
 						$line = wordwrap($line, 80);
@@ -341,7 +342,7 @@ class Parser
 					}
 					else
 					{
-						Error::Show("Invalid parameter '$argument'");
+						Error::Show(t("Invalid parameter") . " '$argument'");
 					}
 				}
 				
@@ -361,7 +362,7 @@ class Parser
 					!in_array("--".$option->long_name, $this->argument_values) &&
 					!in_array("-".$option->short_name, $this->argument_values)
 				)
-					Error::Show ("Missing required option '--{$option->long_name}'");
+					Error::Show (t("Missing required option") . " '--{$option->long_name}'");
 			}
 			
 			$argi = 1;
@@ -409,13 +410,13 @@ class Parser
 							}
 							else
 							{
-								Error::Show("Invalid value supplied for '$argument_original'");
+								Error::Show(t("Invalid value supplied for") . " '$argument_original'");
 							}
 						}
 					}
 					elseif(!$this->IsCommand($argument))
 					{
-						Error::Show("Invalid parameter '$argument_original'");
+						Error::Show(t("Invalid parameter") . " '$argument_original'");
 					}
 				}
 				else

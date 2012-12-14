@@ -21,7 +21,7 @@ class Init extends \Peg\CommandLine\Command
 	{
 		parent::__construct("init");
 		
-		$this->description = "Populates a directory with skeleton files in preparation for generating an extension source code.";
+		$this->description = t("Populates a directory with skeleton files in preparation for generating an extension source code.");
 		
 		$this->RegisterAction(new Action\Init());
 		
@@ -30,8 +30,8 @@ class Init extends \Peg\CommandLine\Command
 			"short_name"=>"a",
 			"type"=>OptionType::STRING,
 			"required"=>true,
-			"description"=>"A comma seperated list of main authors going to be working on the extension.\n" .
-			"Example: --authors \"Author1, Author2\"",
+			"description"=>t("A comma seperated list of main authors going to be working on the extension.") . "\n" .
+			t("Example:") . " --authors \"" . t("Author1, Author2") . "\"",
 			"default_value"=>""
 		));
 		
@@ -42,8 +42,8 @@ class Init extends \Peg\CommandLine\Command
 			"short_name"=>"c",
 			"type"=>OptionType::STRING,
 			"required"=>false,
-			"description"=>"A comma seperated list of contributors.\n".
-			"Example: --contributors \"Contributor1, Contributor2\"",
+			"description"=>t("A comma seperated list of contributors.") . "\n".
+			t("Example:") . " --contributors \"" . t("Contributor1, Contributor2") . "\"",
 			"default_value"=>""
 		));
 		
@@ -54,7 +54,7 @@ class Init extends \Peg\CommandLine\Command
 			"short_name"=>"n",
 			"type"=>OptionType::STRING,
 			"required"=>false,
-			"description"=>"A name for the extension that overrides current working directory name.",
+			"description"=>t("A name for the extension that overrides current working directory name."),
 			"default_value"=>""
 		));
 		
@@ -65,7 +65,7 @@ class Init extends \Peg\CommandLine\Command
 			"short_name"=>"i",
 			"type"=>OptionType::STRING,
 			"required"=>false,
-			"description"=>"Set the extension version. Default: 0.1.",
+			"description"=>t("Set the extension version. Default: 0.1."),
 			"default_value"=>"0.1"
 		));
 		
@@ -76,7 +76,7 @@ class Init extends \Peg\CommandLine\Command
 			"short_name"=>"f",
 			"type"=>OptionType::FLAG,
 			"required"=>false,
-			"description"=>"Forces the initialization of a directory by overriding all it's content. Use with caution.",
+			"description"=>t("Forces the initialization of a directory by overriding all it's content. Use with caution."),
 			"default_value"=>""
 		));
 		

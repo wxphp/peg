@@ -50,7 +50,7 @@ class Init extends \Peg\CommandLine\Action
 		if(!$force)
 		{
 			if(count($files) > 0)
-				Error::Show ("The directory you are trying to initialize is not empty.");
+				Error::Show (t("The directory you are trying to initialize is not empty."));
 		}
 		
 		$this->CopySkeleton($extension_dir, $extension, $version, $authors, $contributors);
