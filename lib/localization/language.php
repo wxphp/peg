@@ -27,6 +27,12 @@ class Language
 	private $directory;
 	
 	/**
+	 * Stores the translation strings parsed from po files.
+	 * @var array 
+	 */
+	private $translations;
+	
+	/**
 	 * Initialize the language class for translating strings.
 	 * @param string $directory Path to directory that holds po files.
 	 * @param string $language The language code from \Localization\LanguageCode
@@ -36,6 +42,8 @@ class Language
 	{
 		if(!file_exists($directory))
 			throw new \Exception("Languages directory not found.");
+		
+		$this->translations = null;
 		
 		$this->directory = $directory;
 		
@@ -70,6 +78,8 @@ class Language
 	 */
 	public function SetLanguage($language=null)
 	{
+		$this->translations = null;
+		
 		if(!$language)
 		{
 			$this->language = $this->GetSystemLangauge();
@@ -94,29 +104,25 @@ class Language
 	
 	/**
 	 * Translates a given text to the currently language set.
-	 * @staticvar array $lang Keeps the language loaded for better performance.
 	 * @param string $text String to translate.
 	 * @return string Translated text or original if no translation found.
 	 */
 	public function Translate($text)
 	{
-		//To reduce the parsing of the po file and just parse once.
-		static $lang;
-
 		$text = trim($text);
 
 		$translation = $text;
 
-		if(!$lang)
+		if(!$this->translations)
 		{
-			$lang = $this->PoParser($this->directory . "/" . $this->language . ".po");
+			$this->translations = $this->PoParser($this->directory . "/" . $this->language . ".po");
 		}
 
 		if($text != "")
 		{
-			if(isset($lang[$text]))
+			if(isset($this->translations[$text]))
 			{
-				$available_translation = $lang[$text];
+				$available_translation = $this->translations[$text];
 
 				if($available_translation != "")
 				{

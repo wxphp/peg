@@ -243,7 +243,7 @@ class Parser
 				if(count($command->options) > 0)
 				{
 					print "\n";
-					print "    " . "Options:" . "\n";
+					print "    " . t("Options:") . "\n";
 					foreach($command->options as $option)
 					{
 						$line = 
