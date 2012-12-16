@@ -45,19 +45,21 @@ function t($text)
 	return $language_object->Translate($text);
 }
 
-// Initialize command line parser
-$parser = new Peg\CommandLine\Parser();
+// Initialize the application
+Peg\Application::Intialize();
 
-// Store the parser on the global settings
-Peg\Application::SetParser($parser);
+// Retrieve a reference of main command line parser
+$parser = Peg\Application::GetParser();
 
 // Set Application details
 $parser->application_name = "peg";
 $parser->application_version = "1.0";
 $parser->application_description = t("PHP Extension Generator (http://github.com/wxphp/peg)");
 
-$parser->RegisterCommand(new Peg\Command\Help());
-$parser->RegisterCommand(new Peg\Command\Init());
+// Register command operations
+$parser->RegisterCommand(Peg\Application::GetHelpCommand());
+$parser->RegisterCommand(Peg\Application::GetInitCommand());
+$parser->RegisterCommand(Peg\Application::GetParseCommand());
 
 $parser->Start($argc, $argv);
 

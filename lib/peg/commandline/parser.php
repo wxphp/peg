@@ -272,6 +272,10 @@ class Parser
 				}
 				
 				print "\n";
+				
+				print str_pad("  ", 80, "-", STR_PAD_RIGHT);
+				
+				print "\n\n";
 			}
 		}
 			

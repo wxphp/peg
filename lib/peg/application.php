@@ -20,50 +20,36 @@ class Application
 	 */
 	private static $parser;
 	
+	/**
+	 * Reference to the help command.
+	 * @var \Peg\Command\Help
+	 */
+	private static $help_command;
+	
+	/**
+	 * Reference to the init command.
+	 * @var \Peg\Command\Init
+	 */
+	private static $init_command;
+	
+	/**
+	 * Reference to the parse command.
+	 * @var \Peg\Command\Parse
+	 */
+	private static $parse_command;
+	
 	// Disable constructor
 	private function __construct(){}
 	
-	/**
-	 * Retreieve the skeleton path from PEG_SKELETON_PATH or throws
-	 * an exception if not exists.
-	 * @return string
-	 * @throws Exception
-	 */
-	public static function GetSkeletonPath()
+	public static function Intialize()
 	{
-		if(file_exists(PEG_SKELETON_PATH))
-			return PEG_SKELETON_PATH;
+		self::$parser = new CommandLine\Parser;
 		
-		throw new Exception("Skeleton path not found.");
-	}
-
-	/**
-	 * Gets the global parser.
-	 * @return \Peg\CommandLine\Parser
-	 */
-	public static function GetParser()
-	{
-		return self::$parser;
+		self::$help_command = new Command\Help;
+		self::$init_command = new Command\Init;
+		self::$parse_command = new Command\Parse;
 	}
 	
-	/**
-	 * Sets the global parser.
-	 * @param \Peg\CommandLine\Parser $parser
-	 */
-	public static function SetParser(\Peg\CommandLine\Parser $parser)
-	{
-		self::$parser = $parser;
-	}
-	
-	/**
-	 * Gets the current working directory.
-	 * @return string
-	 */
-	public static function GetCwd()
-	{
-		return $_SERVER["PWD"];
-	}
-
 	/**
 	 * Check if the current directory is of a valid extension.
 	 * @return boolean
@@ -107,6 +93,65 @@ class Application
 		}
 		
 		return false;
+	}
+	
+	/**
+	 * Gets the current working directory.
+	 * @return string
+	 */
+	public static function GetCwd()
+	{
+		return $_SERVER["PWD"];
+	}
+	
+	/**
+	 * Retreieve the skeleton path from PEG_SKELETON_PATH or throws
+	 * an exception if not exists.
+	 * @return string
+	 * @throws Exception
+	 */
+	public static function GetSkeletonPath()
+	{
+		if(file_exists(PEG_SKELETON_PATH))
+			return PEG_SKELETON_PATH;
+		
+		throw new Exception("Skeleton path not found.");
+	}
+
+	/**
+	 * Gets the global command line parser.
+	 * @return \Peg\CommandLine\Parser
+	 */
+	public static function GetParser()
+	{
+		return self::$parser;
+	}
+	
+	/**
+	 * Gets a reference to init command currently used by peg.
+	 * @return \Peg\Command\Init
+	 */
+	public static function GetInitCommand()
+	{
+		return self::$init_command;
+	}
+	
+	/**
+	 * Gets a reference to help command currently used by peg.
+	 * @return \Peg\Command\Help
+	 */
+	public static function GetHelpCommand()
+	{
+		return self::$help_command;
+	}
+	
+	/**
+	 * Gets a reference to parse command currently used by peg.
+	 * @return \Peg\Command\Parse
+	 */
+	public static function GetParseCommand()
+	{
+		return self::$parse_command;
 	}
 }
 
