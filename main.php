@@ -10,14 +10,23 @@
  * 
 */
 
-// Change this as needed
-//define("PEG_SKELETON_PATH", "./skeleton");
-//define("PEG_LIBRARY_PATH", "./");
-//define("PEG_LOCALE_PATH", "./locale");
+// Set the path to peg files by using environment variables if available,
+// if not use current path
+if(isset($_SERVER["PEG_SKELETON_PATH"]))
+	define("PEG_SKELETON_PATH", $_SERVER["PEG_SKELETON_PATH"]);
+else
+	define("PEG_SKELETON_PATH", "./skeleton");
 
-define("PEG_SKELETON_PATH", "/home/jgm/Development/peg.git/skeleton");
-define("PEG_LIBRARY_PATH", "/home/jgm/Development/peg.git/");
-define("PEG_LOCALE_PATH", "/home/jgm/Development/peg.git/locale");
+if(isset($_SERVER["PEG_LIBRARY_PATH"]))
+	define("PEG_LIBRARY_PATH", $_SERVER["PEG_LIBRARY_PATH"]);
+else 
+	define("PEG_LIBRARY_PATH", "./");
+
+if(isset($_SERVER["PEG_LOCALE_PATH"]))
+	define("PEG_LOCALE_PATH", $_SERVER["PEG_LOCALE_PATH"]);
+else
+	define("PEG_LOCALE_PATH", "./locale");
+
 
 if(!file_exists(PEG_LIBRARY_PATH . "lib"))
 	throw new Exception("Peg lib path not found.");
