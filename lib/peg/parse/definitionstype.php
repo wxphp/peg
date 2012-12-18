@@ -28,11 +28,13 @@ class DefinitionsType
 	
 	const CLASSES = 7;
 	
-	const CLASS_VARIABLES = 8;
+	const CLASS_ENUMERATIONS = 8;
 	
-	const CLASS_GROUPS = 9;
+	const CLASS_VARIABLES = 9;
 	
-	const INCLUDES = 10;
+	const CLASS_GROUPS = 10;
+	
+	const INCLUDES = 11;
 }
 
 ?>

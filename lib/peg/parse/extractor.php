@@ -40,6 +40,8 @@ abstract class Extractor extends \Peg\CommandLine\Action
 	
 	protected $classes;
 	
+	protected $class_enumerations;
+	
 	protected $class_variables;
 	
 	protected $class_groups;
@@ -56,6 +58,7 @@ abstract class Extractor extends \Peg\CommandLine\Action
 		$this->type_definitions = array();
 		$this->functions = array();
 		$this->classes = array();
+		$this->class_enumerations = array();
 		$this->class_variables = array();
 		$this->class_groups = array();
 		$this->includes = array();
@@ -123,14 +126,21 @@ abstract class Extractor extends \Peg\CommandLine\Action
 			
 			case DefinitionsType::CLASSES:
 				file_put_contents($path . "/classes.json", Json::Encode($this->classes));
+				print "Classes found: " . $this->CountDefinitions($this->classes) . "\n";
+				break;
+			
+			case DefinitionsType::CLASS_ENUMERATIONS:
+				file_put_contents($path . "/class_enumerations.json", Json::Encode($this->class_enumerations));
+				print "Class enumerations found: " . $this->CountDefinitions($this->class_enumerations) . "\n";
 				break;
 			
 			case DefinitionsType::CLASS_VARIABLES:
-				file_put_contents($path . "/variables.json", Json::Encode($this->class_variables));
+				file_put_contents($path . "/class_variables.json", Json::Encode($this->class_variables));
+				print "Class variables found: " . $this->CountDefinitions($this->class_variables) . "\n";
 				break;
 			
 			case DefinitionsType::CLASS_GROUPS:
-				file_put_contents($path . "/groups.json", Json::Encode($this->class_groups));
+				file_put_contents($path . "/class_groups.json", Json::Encode($this->class_groups));
 				break;
 			
 			case DefinitionsType::INCLUDES:

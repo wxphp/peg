@@ -11,9 +11,13 @@
 */
 
 // Change this as needed
-define("PEG_SKELETON_PATH", "./skeleton");
-define("PEG_LIBRARY_PATH", "./");
-define("PEG_LOCALE_PATH", "./locale");
+//define("PEG_SKELETON_PATH", "./skeleton");
+//define("PEG_LIBRARY_PATH", "./");
+//define("PEG_LOCALE_PATH", "./locale");
+
+define("PEG_SKELETON_PATH", "/home/jgm/Development/peg.git/skeleton");
+define("PEG_LIBRARY_PATH", "/home/jgm/Development/peg.git/");
+define("PEG_LOCALE_PATH", "/home/jgm/Development/peg.git/locale");
 
 if(!file_exists(PEG_LIBRARY_PATH . "lib"))
 	throw new Exception("Peg lib path not found.");
