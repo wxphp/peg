@@ -67,7 +67,7 @@ abstract class Extractor extends \Peg\CommandLine\Action
 	public function OnCall(\Peg\CommandLine\Command $command) 
 	{
 		if(!Application::ValidExtension())
-			Error::Show ("The current directory is not a valid peg managed extension.");
+			Error::Show (t("The current directory is not a valid peg managed extension."));
 		
 		if(!file_exists(Application::GetCwd() . "/json"))
 			FileSystem::MakeDir (Application::GetCwd () . "/json");
@@ -99,52 +99,52 @@ abstract class Extractor extends \Peg\CommandLine\Action
 		{
 			case DefinitionsType::CONSTANTS:
 				file_put_contents($path . "/constants.json", Json::Encode($this->constants));
-				print "Constants found: " . $this->CountDefinitions($this->constants) . "\n";
+				print t("Constants found:") . " " . $this->CountDefinitions($this->constants) . "\n";
 				break;
 			
 			case DefinitionsType::ENUMERATIONS:
 				file_put_contents($path . "/enumerations.json", Json::Encode($this->enumerations));
-				print "Enumerations found: " . $this->CountDefinitions($this->enumerations) . "\n";
+				print t("Enumerations found:") . " " . $this->CountDefinitions($this->enumerations) . "\n";
 				break;
 			
 			case DefinitionsType::VARIABLES:
 				file_put_contents($path . "/variables.json", Json::Encode($this->variables));
-				print "Variables found: " . $this->CountDefinitions($this->variables) . "\n";
+				print t("Variables found:") . " " . $this->CountDefinitions($this->variables) . "\n";
 				break;
 			
 			case DefinitionsType::TYPE_DEFINITIONS:
 				file_put_contents($path . "/type_definitions.json", Json::Encode($this->type_definitions));
-				print "Type definitions found: " . $this->CountDefinitions($this->type_definitions) . "\n";
+				print t("Type definitions found:") . " " . $this->CountDefinitions($this->type_definitions) . "\n";
 				break;
 			
 			case DefinitionsType::RESOURCES:
 				file_put_contents($path . "/resources.json", Json::Encode($this->resources));
-				print "Resources found: " . $this->CountDefinitions($this->resources) . "\n";
+				print t("Resources found:") . " " . $this->CountDefinitions($this->resources) . "\n";
 				break;
 			
 			case DefinitionsType::FUNCTIONS:
 				file_put_contents($path . "/functions.json", Json::Encode($this->functions));
-				print "Functions found: " . $this->CountDefinitions($this->functions) . "\n";
+				print t("Functions found:") . " " . $this->CountDefinitions($this->functions) . "\n";
 				break;
 			
 			case DefinitionsType::CLASSES:
 				file_put_contents($path . "/classes.json", Json::Encode($this->classes));
-				print "Classes found: " . $this->CountDefinitions($this->classes) . "\n";
+				print t("Classes found:") . " " . $this->CountDefinitions($this->classes) . "\n";
 				break;
 			
 			case DefinitionsType::CLASS_ENUMERATIONS:
 				file_put_contents($path . "/class_enumerations.json", Json::Encode($this->class_enumerations));
-				print "Class enumerations found: " . $this->CountDefinitions($this->class_enumerations) . "\n";
+				print t("Class enumerations found:") . " " . $this->CountDefinitions($this->class_enumerations) . "\n";
 				break;
 			
 			case DefinitionsType::CLASS_VARIABLES:
 				file_put_contents($path . "/class_variables.json", Json::Encode($this->class_variables));
-				print "Class variables found: " . $this->CountDefinitions($this->class_variables) . "\n";
+				print t("Class variables found:") . " " . $this->CountDefinitions($this->class_variables) . "\n";
 				break;
 			
 			case DefinitionsType::INCLUDES:
 				file_put_contents($path . "/includes.json", Json::Encode($this->includes));
-				print "Header files found: " . count($this->includes) . "\n";
+				print t("Header files found:") . " " . count($this->includes) . "\n";
 				break;
 			
 			default:
