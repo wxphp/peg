@@ -32,9 +32,7 @@ class DefinitionsType
 	
 	const CLASS_VARIABLES = 9;
 	
-	const CLASS_GROUPS = 10;
-	
-	const INCLUDES = 11;
+	const INCLUDES = 10;
 }
 
 ?>

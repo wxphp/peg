@@ -24,6 +24,8 @@ abstract class Extractor extends \Peg\CommandLine\Action
 	
 	protected $input_format;
 	
+	protected $headers_path;
+	
 	protected $verbose;
 	
 	protected $constants;
@@ -44,9 +46,8 @@ abstract class Extractor extends \Peg\CommandLine\Action
 	
 	protected $class_variables;
 	
-	protected $class_groups;
-	
 	protected $includes;
+	
 	
 	public function __construct($input_format)
 	{
@@ -60,7 +61,6 @@ abstract class Extractor extends \Peg\CommandLine\Action
 		$this->classes = array();
 		$this->class_enumerations = array();
 		$this->class_variables = array();
-		$this->class_groups = array();
 		$this->includes = array();
 	}
 	
@@ -76,6 +76,8 @@ abstract class Extractor extends \Peg\CommandLine\Action
 		{
 			$this->command = $command;
 			
+			$this->headers_path = rtrim(str_replace("\\", "/", $command->GetOption("headers")->GetValue()), "/") . "/";
+			
 			$this->verbose = $command->GetOption("verbose")->active;
 			
 			$this->Start($command->GetOption("source")->GetValue());
@@ -87,9 +89,9 @@ abstract class Extractor extends \Peg\CommandLine\Action
 	 * Can generate definitions of a specific type if the $type is specified
 	 * using one of the values from \Peg\Parse\DefinitionsType
 	 * @param string $path
-	 * @param integer $type If not set generates definitions for all types.
+	 * @param integer $type The type of definitions file to generate.
 	 */
-	public function SaveDefinitions($path, $type=null)
+	public function SaveDefinitions($path, $type)
 	{
 		$path = rtrim($path, "/\\");
 		
@@ -117,6 +119,7 @@ abstract class Extractor extends \Peg\CommandLine\Action
 			
 			case DefinitionsType::RESOURCES:
 				file_put_contents($path . "/resources.json", Json::Encode($this->resources));
+				print "Resources found: " . $this->CountDefinitions($this->resources) . "\n";
 				break;
 			
 			case DefinitionsType::FUNCTIONS:
@@ -139,28 +142,20 @@ abstract class Extractor extends \Peg\CommandLine\Action
 				print "Class variables found: " . $this->CountDefinitions($this->class_variables) . "\n";
 				break;
 			
-			case DefinitionsType::CLASS_GROUPS:
-				file_put_contents($path . "/class_groups.json", Json::Encode($this->class_groups));
-				break;
-			
 			case DefinitionsType::INCLUDES:
 				file_put_contents($path . "/includes.json", Json::Encode($this->includes));
+				print "Header files found: " . count($this->includes) . "\n";
 				break;
 			
-			default: // Save all definitions
-				file_put_contents($path . "/constants.json", Json::Encode($this->constants));
-				file_put_contents($path . "/enumerations.json", Json::Encode($this->constants));
-				file_put_contents($path . "/variables.json", Json::Encode($this->constants));
-				file_put_contents($path . "/type_definitions.json", Json::Encode($this->constants));
-				file_put_contents($path . "/resources.json", Json::Encode($this->constants));
-				file_put_contents($path . "/functions.json", Json::Encode($this->constants));
-				file_put_contents($path . "/classes.json", Json::Encode($this->constants));
-				file_put_contents($path . "/variables.json", Json::Encode($this->constants));
-				file_put_contents($path . "/groups.json", Json::Encode($this->constants));
-				file_put_contents($path . "/includes.json", Json::Encode($this->constants));
+			default:
 		}
 	}
 	
+	/**
+	 * Counts the amount of definitions.
+	 * @param array $definitions
+	 * @return integer
+	 */
 	private function CountDefinitions($definitions)
 	{
 		$definitions_found = 0;
@@ -174,6 +169,11 @@ abstract class Extractor extends \Peg\CommandLine\Action
 		return $definitions_found;
 	}
 	
+	/**
+	 * Needs to be implemented by classes extending this one in order to
+	 * begin the parsing process when the input format matches that of the
+	 * action been called.
+	 */
 	abstract public function Start($path);
 }
 

@@ -155,7 +155,6 @@ class Parser
 		
 		if(
 			$this->argument_count <= 1 ||
-			in_array("-h", $this->argument_values) ||
 			in_array("--help", $this->argument_values)	
 		)
 		{

@@ -48,6 +48,17 @@ class Parse extends \Peg\CommandLine\Command
 		
 		$this->AddOption($source);
 		
+		$headers = new Option(array(
+			"long_name"=>"headers",
+			"short_name"=>"h",
+			"type"=>OptionType::STRING,
+			"required"=>true,
+			"description"=>t("The path were resides the header files of the library in order to correctly solve headers include path."),
+			"default_value"=>""
+		));
+		
+		$this->AddOption($headers);
+		
 		$verbose = new Option(array(
 			"long_name"=>"verbose",
 			"short_name"=>"v",

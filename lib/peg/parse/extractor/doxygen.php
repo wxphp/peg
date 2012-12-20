@@ -31,6 +31,9 @@ class Doxygen extends \Peg\Parse\Extractor
 	 */
 	private $path;
 	
+	/**
+	 * Initialize this action to be of input type doxygen.
+	 */
 	public function __construct()
 	{
 		parent::__construct("doxygen");
@@ -58,6 +61,7 @@ class Doxygen extends \Peg\Parse\Extractor
 		
 		print "--------------------------------------------------------------\n";
 		
+		$this->SaveDefinitions(Application::GetCwd() . "/json", DefinitionsType::INCLUDES);
 		$this->SaveDefinitions(Application::GetCwd() . "/json", DefinitionsType::CONSTANTS);
 		$this->SaveDefinitions(Application::GetCwd() . "/json", DefinitionsType::ENUMERATIONS);
 		$this->SaveDefinitions(Application::GetCwd() . "/json", DefinitionsType::VARIABLES);
@@ -79,12 +83,18 @@ class Doxygen extends \Peg\Parse\Extractor
 	{
 		$xpath = new DOMXPath($document);
 		
-		$entries = $xpath->evaluate("//compound[@kind='file']", $document);
+		$entries = $xpath->evaluate("//compound[@kind='file'] | //compound[@kind='namespace']", $document);
 		
 		for ($i = 0; $i < $entries->length; $i++) 
 		{
+			$kind = $entries->item($i)->getAttribute("kind");
 			$refid = $entries->item($i)->getAttribute("refid");
 			$name = $entries->item($i)->childNodes->item(0)->nodeValue;
+			
+			if($kind == "namespace")
+				$namespace = str_replace ("::", "\\", $name);
+			else
+				$namespace = "";
 			
 			$file_doc = new DOMDocument();
 			$file_doc->load($this->path . "/$refid.xml");
@@ -93,11 +103,21 @@ class Doxygen extends \Peg\Parse\Extractor
 
 			$file_members = $file_xpath->evaluate("//memberdef[@kind='define'] | //memberdef[@kind='enum']", $file_doc);
 			
-			$this->constants[$name] = array();
-			
 			for($member=0; $member<$file_members->length; $member++)
 			{
 				$kind = $file_members->item($member)->getAttribute("kind");
+				
+				$location =	str_replace(
+					$this->headers_path,
+					"",
+					str_replace(
+						"\\",
+						"/",
+						$file_xpath->evaluate("location", $file_members->item($member))->item(0)->getAttribute("file")
+					)
+				);
+				
+				$this->includes[$location] = true;
 				
 				if($kind == "define")
 				{
@@ -122,7 +142,7 @@ class Doxygen extends \Peg\Parse\Extractor
 						continue;
 					}
 
-					$this->constants[$name][$namespace][$define_name] = "$define_initializer";
+					$this->constants[$location][$namespace][$define_name] = "$define_initializer";
 				}
 				
 				// Also add anonymous enumerations as constants
@@ -137,14 +157,10 @@ class Doxygen extends \Peg\Parse\Extractor
 
 					for($enum_value=0; $enum_value<$enum_values->length; $enum_value++)
 					{
-						$this->constants[$name][$namespace][$file_xpath->evaluate("name", $enum_values->item($enum_value))->item(0)->nodeValue] = true;
+						$this->constants[$location][$namespace][$file_xpath->evaluate("name", $enum_values->item($enum_value))->item(0)->nodeValue] = true;
 					}
 				}
 			}
-			
-			// Remove files without enumerations
-			if(count($this->constants[$name]) <= 0)
-				unset($this->constants[$name]);
 		}
 	}
 	
@@ -157,12 +173,18 @@ class Doxygen extends \Peg\Parse\Extractor
 	{
 		$xpath = new DOMXPath($document);
 		
-		$entries = $xpath->evaluate("//compound[@kind='file']", $document);
+		$entries = $xpath->evaluate("//compound[@kind='file'] | //compound[@kind='namespace']", $document);
 		
 		for ($i = 0; $i < $entries->length; $i++) 
 		{
+			$kind = $entries->item($i)->getAttribute("kind");
 			$refid = $entries->item($i)->getAttribute("refid");
 			$name = $entries->item($i)->childNodes->item(0)->nodeValue;
+			
+			if($kind == "namespace")
+				$namespace = str_replace ("::", "\\", $name);
+			else
+				$namespace = "";
 			
 			$file_doc = new DOMDocument();
 			$file_doc->load($this->path . "/$refid.xml");
@@ -170,31 +192,37 @@ class Doxygen extends \Peg\Parse\Extractor
 			$file_xpath = new DOMXPath($file_doc);
 
 			$file_members = $file_xpath->evaluate("//memberdef[@kind='enum']", $file_doc);
-			
-			$this->enumerations[$name] = array();
 
 			for($member=0; $member<$file_members->length; $member++)
 			{
+				$location =	str_replace(
+					$this->headers_path,
+					"",
+					str_replace(
+						"\\",
+						"/",
+						$file_xpath->evaluate("location", $file_members->item($member))->item(0)->getAttribute("file")
+					)
+				);
+				
+				$this->includes[$location] = true;
+				
 				$enum_name = $file_xpath->evaluate("name", $file_members->item($member))->item(0)->nodeValue;
 
 				// Just extract named enumerations
 				// Anonymous enumerations go on constants.json
 				if($enum_name{0} != "@")
 				{
-					$this->enumerations[$name][$namespace][$enum_name] = array();
+					$this->enumerations[$location][$namespace][$enum_name] = array();
 					
 					$enum_values = $file_xpath->evaluate("enumvalue", $file_members->item($member));
 					
 					for($enum_value=0; $enum_value<$enum_values->length; $enum_value++)
 					{
-						$this->enumerations[$name][$namespace][$enum_name][] = $file_xpath->evaluate("name", $enum_values->item($enum_value))->item(0)->nodeValue;
+						$this->enumerations[$location][$namespace][$enum_name][] = $file_xpath->evaluate("name", $enum_values->item($enum_value))->item(0)->nodeValue;
 					}
 				}
 			}
-			
-			// Remove files without enumerations
-			if(count($this->enumerations[$name]) <= 0)
-				unset($this->enumerations[$name]);
 		}
 	}
 	
@@ -207,12 +235,18 @@ class Doxygen extends \Peg\Parse\Extractor
 	{
 		$xpath = new DOMXPath($document);
 		
-		$entries = $xpath->evaluate("//compound[@kind='file']", $document);
+		$entries = $xpath->evaluate("//compound[@kind='file'] | //compound[@kind='namespace']", $document);
 		
 		for ($i = 0; $i < $entries->length; $i++) 
 		{
+			$kind = $entries->item($i)->getAttribute("kind");
 			$refid = $entries->item($i)->getAttribute("refid");
 			$name = $entries->item($i)->childNodes->item(0)->nodeValue;
+			
+			if($kind == "namespace")
+				$namespace = str_replace ("::", "\\", $name);
+			else
+				$namespace = "";
 			
 			$file_doc = new DOMDocument();
 			$file_doc->load($this->path . "/$refid.xml");
@@ -221,19 +255,25 @@ class Doxygen extends \Peg\Parse\Extractor
 
 			$file_members = $file_xpath->evaluate("//memberdef[@kind='variable']", $file_doc);
 			
-			$this->variables[$name] = array();
-			
 			for($member=0; $member<$file_members->length; $member++)
 			{
+				$location =	str_replace(
+					$this->headers_path,
+					"",
+					str_replace(
+						"\\",
+						"/",
+						$file_xpath->evaluate("location", $file_members->item($member))->item(0)->getAttribute("file")
+					)
+				);
+				
+				$this->includes[$location] = true;
+				
 				$global_variable_name = $file_xpath->evaluate("name", $file_members->item($member))->item(0)->nodeValue;
 				$global_variable_type = $file_xpath->evaluate("type", $file_members->item($member))->item(0)->nodeValue;
 				
-				$this->variables[$name][$namespace][$global_variable_name] = str_replace(array(" *", " &"), array("*", "&"), $global_variable_type);
+				$this->variables[$location][$namespace][$global_variable_name] = str_replace(array(" *", " &"), array("*", "&"), $global_variable_type);
 			}
-			
-			// Remove files without variables
-			if(count($this->variables[$name]) <= 0)
-				unset($this->variables[$name]);
 		}
 	}
 	
@@ -246,12 +286,18 @@ class Doxygen extends \Peg\Parse\Extractor
 	{
 		$xpath = new DOMXPath($document);
 		
-		$entries = $xpath->evaluate("//compound[@kind='file']", $document);
+		$entries = $xpath->evaluate("//compound[@kind='file'] | //compound[@kind='namespace']", $document);
 		
 		for ($i = 0; $i < $entries->length; $i++) 
 		{
+			$kind = $entries->item($i)->getAttribute("kind");
 			$refid = $entries->item($i)->getAttribute("refid");
 			$name = $entries->item($i)->childNodes->item(0)->nodeValue;
+			
+			if($kind == "namespace")
+				$namespace = str_replace ("::", "\\", $name);
+			else
+				$namespace = "";
 			
 			$file_doc = new DOMDocument();
 			$file_doc->load($this->path . "/$refid.xml");
@@ -260,19 +306,25 @@ class Doxygen extends \Peg\Parse\Extractor
 
 			$file_members = $file_xpath->evaluate("//memberdef[@kind='typedef']", $file_doc);
 			
-			$this->type_definitions[$name] = array();
-			
 			for($member=0; $member<$file_members->length; $member++)
 			{
+				$location =	str_replace(
+					$this->headers_path,
+					"",
+					str_replace(
+						"\\",
+						"/",
+						$file_xpath->evaluate("location", $file_members->item($member))->item(0)->getAttribute("file")
+					)
+				);
+				
+				$this->includes[$location] = true;
+				
 				$typedef_name = $file_xpath->evaluate("name", $file_members->item($member))->item(0)->nodeValue;
 				$typedef_type = $file_xpath->evaluate("type", $file_members->item($member))->item(0)->nodeValue;
 				
-				$this->type_definitions[$name][$namespace][$typedef_name] = $typedef_type;
+				$this->type_definitions[$location][$namespace][$typedef_name] = $typedef_type;
 			}
-			
-			// Remove files without type definitions
-			if(count($this->type_definitions[$name]) <= 0)
-				unset($this->type_definitions[$name]);
 		}
 	}
 	
@@ -285,12 +337,18 @@ class Doxygen extends \Peg\Parse\Extractor
 	{
 		$xpath = new DOMXPath($document);
 		
-		$entries = $xpath->evaluate("//compound[@kind='file']", $document);
+		$entries = $xpath->evaluate("//compound[@kind='file'] | //compound[@kind='namespace']", $document);
 		
 		for ($i = 0; $i < $entries->length; $i++) 
 		{
+			$kind = $entries->item($i)->getAttribute("kind");
 			$refid = $entries->item($i)->getAttribute("refid");
 			$name = $entries->item($i)->childNodes->item(0)->nodeValue;
+			
+			if($kind == "namespace")
+				$namespace = str_replace ("::", "\\", $name);
+			else
+				$namespace = "";
 			
 			$file_doc = new DOMDocument();
 			$file_doc->load($this->path . "/$refid.xml");
@@ -299,10 +357,20 @@ class Doxygen extends \Peg\Parse\Extractor
 
 			$file_members = $file_xpath->evaluate("//memberdef[@kind='function']", $file_doc);
 			
-			$this->functions[$name] = array();
-			
 			for($member=0; $member<$file_members->length; $member++)
 			{
+				$location =	str_replace(
+					$this->headers_path,
+					"",
+					str_replace(
+						"\\",
+						"/",
+						$file_xpath->evaluate("location", $file_members->item($member))->item(0)->getAttribute("file")
+					)
+				);
+				
+				$this->includes[$location] = true;
+			
 				$function_name = $file_xpath->evaluate("name", $file_members->item($member))->item(0)->nodeValue;
 				
 				$function_type = $file_xpath->evaluate("type", $file_members->item($member))->item(0)->nodeValue;
@@ -357,7 +425,7 @@ class Doxygen extends \Peg\Parse\Extractor
 
 				if(count($parameters) > 0)
 				{
-					$this->functions[$name][$namespace][$function_name][] = array(
+					$this->functions[$location][$namespace][$function_name][] = array(
 						"return_type"=>$function_type, 
 						"brief_description"=>$function_brief_description,
 						"parameters"=>$parameters
@@ -365,16 +433,12 @@ class Doxygen extends \Peg\Parse\Extractor
 				}
 				else
 				{
-					$this->functions[$name][$namespace][$function_name][] = array(
+					$this->functions[$location][$namespace][$function_name][] = array(
 						"return_type"=>$function_type, 
 						"brief_description"=>$function_brief_description
 					);
 				}
 			}
-			
-			// Remove files without functions
-			if(count($this->functions[$name]) <= 0)
-				unset($this->functions[$name]);
 		}
 	}
 	
@@ -395,6 +459,20 @@ class Doxygen extends \Peg\Parse\Extractor
 			$kind = $entries->item($i)->getAttribute("kind");
 			$refid = $entries->item($i)->getAttribute("refid");
 			$name = $entries->item($i)->childNodes->item(0)->nodeValue;
+			
+			// Check if class is part of a namespace
+			$name_parts = explode("::", $name);
+			
+			if(count($name_parts) > 0)
+			{
+				$name = $name_parts[count($name_parts)-1];
+				unset($name_parts[count($name_parts)-1]);
+				$namespace = implode("\\", $name_parts);
+			}
+			else
+			{
+				$namespace = "";
+			}
 
 			$class_doc = new DOMDocument();
 			$class_doc->load($this->path . "/$refid.xml");
@@ -403,6 +481,8 @@ class Doxygen extends \Peg\Parse\Extractor
 
 			// Retreive include file
 			$header_file = $class_xpath->evaluate("//includes", $class_doc)->item(0)->nodeValue;
+			
+			$this->includes[$header_file] = true;
 			
 			$this->classes[$header_file][$namespace][$name] = array();
 		
