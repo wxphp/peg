@@ -31,7 +31,7 @@ else
 if(!file_exists(PEG_LIBRARY_PATH . "lib"))
 	throw new Exception("Peg lib path not found.");
 
-if(!file_exists(PEG_LIBRARY_PATH . "lib"))
+if(!file_exists(PEG_SKELETON_PATH))
 	throw new Exception("Peg skeleton files path not found.");
 
 // Register class auto-loader
@@ -59,7 +59,7 @@ function t($text)
 }
 
 // Initialize the application
-Peg\Application::Intialize();
+Peg\Application::Initialize();
 
 // Retrieve a reference of main command line parser
 $parser = Peg\Application::GetParser();

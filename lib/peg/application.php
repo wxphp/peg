@@ -45,7 +45,7 @@ class Application
 	 * Initialize all variables used by Peg. Has to be called before any usage
 	 * of peg.
 	 */
-	public static function Intialize()
+	public static function Initialize()
 	{
 		self::$parser = new CommandLine\Parser;
 		
