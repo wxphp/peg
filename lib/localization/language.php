@@ -1,10 +1,11 @@
 <?php
-/*
+/**
+ * Defines the language class used for translating system strings by using
+ * po files for different languages.
+ * 
  * @author Jefferson González
- * 
- * @license 
- * This file is part of PEG check the license file for information.
- * 
+ * @license MIT
+ * @link http://github.com/wxphp/peg Source code.
 */
 
 namespace Localization;

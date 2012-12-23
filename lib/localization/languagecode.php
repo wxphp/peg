@@ -1,10 +1,11 @@
 <?php
-/*
+/**
+ * Defines a class that serves as enumeration of the different language codes
+ * that are used as the file names of each po file.
+ * 
  * @author Jefferson González
- * 
- * @license 
- * This file is part of PEG check the license file for information.
- * 
+ * @license MIT
+ * @link http://github.com/wxphp/peg Source code.
 */
 
 namespace Localization;

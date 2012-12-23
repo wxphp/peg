@@ -1,17 +1,14 @@
 <?php
-/*
- * @author Jefferson González
- * 
- * @license 
- * This file is part of PEG check the license file for information.
- * 
- * @description
+/**
  * Main start point for the PHP Extensions Generator
  * 
+ * @author Jefferson González
+ * @license MIT
+ * @link http://github.com/wxphp/peg Source code.
 */
 
 // Set the path to peg files by using environment variables if available,
-// if not use current path
+// if not, it uses current path
 if(isset($_SERVER["PEG_SKELETON_PATH"]))
 	define("PEG_SKELETON_PATH", $_SERVER["PEG_SKELETON_PATH"]);
 else

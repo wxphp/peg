@@ -1,10 +1,8 @@
 <?php
-/*
+/**
  * @author Jefferson González
- * 
- * @license 
- * This file is part of PEG check the license file for information.
- * 
+ * @license MIT
+ * @link http://github.com/wxphp/peg Source code. 
 */
 
 namespace Peg\CommandLine;
@@ -214,7 +212,7 @@ class Parser
 				}
 			}
 			
-			print "   peg <command> " . t("[options]") . "\n";
+			print "   " . $this->application_name . " <command> " . t("[options]") . "\n";
 		}
 		
 		if(count($this->commands) > 0)

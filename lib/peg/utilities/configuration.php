@@ -1,10 +1,10 @@
 <?php
-/*
+/**
+ * Defines a class for easily working with ini files.
+ * 
  * @author Jefferson González
- * 
- * @license 
- * This file is part of PEG check the license file for information.
- * 
+ * @license MIT
+ * @link http://github.com/wxphp/peg Source code. 
 */
 
 namespace Peg\Utilities;
@@ -72,6 +72,15 @@ class Configuration
 		}
 		
 		return false;
+	}
+	
+	/**
+	 * Get all settings.
+	 * @return array
+	 */
+	static function GetAll()
+	{
+		return self::$settings;
 	}
 	
 	/**
