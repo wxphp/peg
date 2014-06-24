@@ -63,7 +63,7 @@ class Signal
             'priority'=>$priority
         );
         
-        $this->listeners[$signal_type] = \Data::Sort(
+        $this->listeners[$signal_type] = SignalHandler::Sort(
             $this->listeners[$signal_type], 'priority'
         );
     }

@@ -2,8 +2,8 @@
 /**
  * @author Jefferson González
  * @license MIT
- * @link http://github.com/wxphp/peg Source code. 
-*/
+ * @link http://github.com/wxphp/peg Source code.
+ */
 
 namespace Peg\CommandLine;
 
@@ -12,10 +12,11 @@ namespace Peg\CommandLine;
  */
 abstract class Action
 {
-	/**
-	 * Method called by the command if it was executed.
-	 */
-	abstract public function OnCall(Command $command);
+
+    /**
+     * Method called by the command if it was executed.
+     */
+    abstract public function OnCall(Command $command);
 }
 
 ?>

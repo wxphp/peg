@@ -61,7 +61,7 @@ class SignalHandler
             'priority' => $priority
         );
 
-        self::$listeners[$signal_type] = \Data::Sort(
+        self::$listeners[$signal_type] = self::Sort(
             self::$listeners[$signal_type], 'priority'
         );
     }
@@ -92,6 +92,41 @@ class SignalHandler
 
         if(count(self::$listeners[$signal_type]) <= 0)
             unset(self::$listeners[$signal_type]);
+    }
+    
+    /**
+     * Sorts an array of listener function using bubble sort.
+     *
+     * @param array $data_array The array to sort in the format returned by data_parser().
+     * @param string $field_name The field we are using to sort the array by.
+     * @param mixed $sort_method The type of sorting, default is ascending. 
+     *
+     * @return array The same array but sorted by the given field name.
+     */
+    public static function Sort($data_array, $field_name, $sort_method = SORT_ASC)
+    {
+        $sorted_array = array();
+
+        if(is_array($data_array))
+        {
+            $field_to_sort_by = array();
+            $new_id_position = array();
+
+            foreach($data_array as $key=>$fields)
+            {
+                $field_to_sort_by[$key] = $fields[$field_name];
+                $new_id_position[$key] = $key;
+            }
+
+            array_multisort($field_to_sort_by, $sort_method, $new_id_position, $sort_method);
+
+            foreach($new_id_position as $id)
+            {
+                $sorted_array[$id] = $data_array[$id];
+            }
+        }
+
+        return $sorted_array;
     }
 
 }

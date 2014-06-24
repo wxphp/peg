@@ -2,8 +2,8 @@
 /**
  * @author Jefferson González
  * @license MIT
- * @link http://github.com/wxphp/peg Source code. 
-*/
+ * @link http://github.com/wxphp/peg Source code.
+ */
 
 namespace Peg\CommandLine;
 
@@ -12,15 +12,17 @@ namespace Peg\CommandLine;
  */
 class Error
 {
-	/**
-	 * Displays a message and exits the application with error status code.
-	 * @param string $message The message to display before exiting the application.
-	 */
-	public static function Show($message)
-	{
-		print t("Error:") . " " . $message . "\n";
-		exit(1);
-	}
+
+    /**
+     * Displays a message and exits the application with error status code.
+     * @param string $message The message to display before exiting the application.
+     */
+    public static function Show($message)
+    {
+        print t("Error:") . " " . $message . "\n";
+        exit(1);
+    }
+
 }
 
 ?>

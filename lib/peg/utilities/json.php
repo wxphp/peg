@@ -2,8 +2,8 @@
 /**
  * @author Jefferson González
  * @license MIT
- * @link http://github.com/wxphp/peg Source code. 
-*/
+ * @link http://github.com/wxphp/peg Source code.
+ */
 
 namespace Peg\Utilities;
 
@@ -13,90 +13,100 @@ namespace Peg\Utilities;
  */
 class Json
 {
-	// Disable constructor
-	private function __construct(){}
-	
-	/**
-	 * Indents a flat JSON string to make it more human-readable.
-	 * URL: http://recursive-design.com/blog/2008/03/11/format-json-with-php/
-	 * @param string $json The original JSON string to process.
-	 * @return string Indented version of the original JSON string.
-	 */
-	private static function Indent($json)
-	{
 
-		$result      = '';
-		$pos         = 0;
-		$strLen      = strlen($json);
-		$indentStr   = "\t";
-		$newLine     = "\n";
-		$prevChar    = '';
-		$outOfQuotes = true;
+    // Disable constructor
+    private function __construct(){}
 
-		for ($i=0; $i<=$strLen; $i++) {
+    /**
+     * Indents a flat JSON string to make it more human-readable.
+     * URL: http://recursive-design.com/blog/2008/03/11/format-json-with-php/
+     * @param string $json The original JSON string to process.
+     * @return string Indented version of the original JSON string.
+     */
+    private static function Indent($json)
+    {
 
-			// Grab the next character in the string.
-			$char = substr($json, $i, 1);
+        $result = '';
+        $pos = 0;
+        $strLen = strlen($json);
+        $indentStr = "\t";
+        $newLine = "\n";
+        $prevChar = '';
+        $outOfQuotes = true;
 
-			// Are we inside a quoted string?
-			if ($char == '"' && $prevChar != '\\') {
-				$outOfQuotes = !$outOfQuotes;
+        for($i = 0; $i <= $strLen; $i++)
+        {
 
-			// If this character is the end of an element, 
-			// output a new line and indent the next line.
-			} else if(($char == '}' || $char == ']') && $outOfQuotes) {
-				$result .= $newLine;
-				$pos --;
-				for ($j=0; $j<$pos; $j++) {
-					$result .= $indentStr;
-				}
-			}
+            // Grab the next character in the string.
+            $char = substr($json, $i, 1);
 
-			// Add the character to the result string.
-			$result .= $char;
+            // Are we inside a quoted string?
+            if($char == '"' && $prevChar != '\\')
+            {
+                $outOfQuotes = !$outOfQuotes;
 
-			// If the last character was the beginning of an element, 
-			// output a new line and indent the next line.
-			if (($char == ',' || $char == '{' || $char == '[') && $outOfQuotes) {
-				$result .= $newLine;
-				if ($char == '{' || $char == '[') {
-					$pos ++;
-				}
+                // If this character is the end of an element,
+                // output a new line and indent the next line.
+            }
+            else if(($char == '}' || $char == ']') && $outOfQuotes)
+            {
+                $result .= $newLine;
+                $pos --;
+                for($j = 0; $j < $pos; $j++)
+                {
+                    $result .= $indentStr;
+                }
+            }
 
-				for ($j = 0; $j < $pos; $j++) {
-					$result .= $indentStr;
-				}
-			}
+            // Add the character to the result string.
+            $result .= $char;
 
-			$prevChar = $char;
-		}
+            // If the last character was the beginning of an element,
+            // output a new line and indent the next line.
+            if(($char == ',' || $char == '{' || $char == '[') && $outOfQuotes)
+            {
+                $result .= $newLine;
+                if($char == '{' || $char == '[')
+                {
+                    $pos ++;
+                }
 
-		return $result;
-	}
+                for($j = 0; $j < $pos; $j++)
+                {
+                    $result .= $indentStr;
+                }
+            }
 
-	/**
-	 * Equivalent of json_encode function but output pretty printed 
-	 * json format to make it possible to edit the output manually.
-	 * @param array $data
-	 * @return string
-	 */
-	function Encode($data)
-	{
-		$data = json_encode($data);
+            $prevChar = $char;
+        }
 
-		return self::Indent($data);
-	}
+        return $result;
+    }
 
-	/**
-	 * Equivalent to json_decode for json but with associative turned on.
-	 * This function retreive json objects as associative array.
-	 * @param string $data Json encoded data.
-	 * @return array
-	 */
-	function Decode($data)
-	{
-		return json_decode($data, true);
-	}
+    /**
+     * Equivalent of json_encode function but output pretty printed
+     * json format to make it possible to edit the output manually.
+     * @param array $data
+     * @return string
+     */
+    function Encode($data)
+    {
+        $data = json_encode($data);
+
+        return self::Indent($data);
+    }
+
+    /**
+     * Equivalent to json_decode for json but with associative turned on.
+     * This function retreive json objects as associative array.
+     * @param string $data Json encoded data.
+     * @return array
+     */
+    function Decode($data)
+    {
+        return json_decode($data, true);
+    }
+
 }
 
 ?>
